@@ -5,6 +5,7 @@ import edu.sdccd.cisc191.architectbankaccount.screen.start.LoginScreen;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.sql.Connection;
 
 public class ScreenManager {
     int height = 400, width = 600;

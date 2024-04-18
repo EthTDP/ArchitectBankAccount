@@ -26,18 +26,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class LoginScreen implements Screen {
     Scene scene;
-    String username;
-    String password;
     ScreenManager manager;
 
     public LoginScreen(ScreenManager manager) {
         startScreen();
-        username = "Cisc191";
-        password = "BestClass!";
         this.manager = manager;
     }
 
@@ -59,6 +56,8 @@ public class LoginScreen implements Screen {
         PasswordField passwordLabel = new PasswordField();
         Button loginButton = new Button("Login");
 
+
+
         try {
             setAnchorPane(pane, usernameLabel, passwordLabel, loginButton, signInLabel);
         } catch (IOException e) {
@@ -67,7 +66,7 @@ public class LoginScreen implements Screen {
         Text passwordCorrect = new Text();
         passwordCorrect.setLayoutX(95);
         passwordCorrect.setLayoutY(310);
-        passwordCorrect.setFont(Font.font("Lucida Console", 15));
+        passwordCorrect.setFont(Font.font("Lucida Console", 10));
 
         usernameLabel.setOnKeyPressed(event -> {
             if(event.getCode() == KeyCode.ENTER) {
@@ -159,15 +158,47 @@ public class LoginScreen implements Screen {
     private void loginToAccount(TextField usernameField, PasswordField passwordField, Text passwordCorrect) {
         String username = usernameField.getText();
         String password = passwordField.getText();
-        // Implementation of Loging In
+        // Implementation of Logging In
 
-        if(!username.equalsIgnoreCase(this.username) && !password.equalsIgnoreCase(this.password)){
-            passwordCorrect.setText("Incorrect Password and Username!! Please try again!");
-        } else if(!password.equalsIgnoreCase(this.password)) {
-            passwordCorrect.setText("Incorrect Password!! Please try again!");
-        } else if(!username.equalsIgnoreCase(this.username)){
-            passwordCorrect.setText("Incorrect Username!! Please try again!");
-        } else {
+        ArrayList<String> usernames = new ArrayList<>();
+        ArrayList<String> passwords = new ArrayList<>();
+
+        try(Connection connection = DriverManager.getConnection("jdbc:postgresql://cisc191.cnja3eafntr2.us-east-1.rds.amazonaws.com:5432/", "postgres", BankAccount.password)) {
+
+            String sql = "SELECT * FROM logininfo";
+
+            try(Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
+                while(resultSet.next()) {
+
+                    usernames.add(resultSet.getString("username"));
+                    passwords.add(resultSet.getString("password"));
+                }
+            } catch (Exception exception) {
+                System.out.println(exception.getMessage());
+            }
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
+        }
+
+        boolean usernameAvailable = false;
+        boolean passwordAvailable = false;
+
+        if(!(usernames.contains(username)) || !(passwords.contains(password)))
+            passwordCorrect.setText("Incorrect Username and Password! Please try again or sign up.");
+
+        if(usernames.contains(username))
+            usernameAvailable = true;
+        else
+            passwordCorrect.setText("Incorrect Username! Please try again or sign up.");
+
+        if(passwords.contains(password))
+            passwordAvailable = true;
+        else
+            passwordCorrect.setText("Incorrect Password! Please try again or sign up.");
+
+
+        if(usernameAvailable && passwordAvailable) {
             manager.setBankScene();
         }
     }

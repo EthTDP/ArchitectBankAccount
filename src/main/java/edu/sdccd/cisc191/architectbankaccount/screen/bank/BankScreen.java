@@ -1,6 +1,5 @@
 package edu.sdccd.cisc191.architectbankaccount.screen.bank;
 
-import edu.sdccd.cisc191.architectbankaccount.BankAccount;
 import edu.sdccd.cisc191.architectbankaccount.screen.Screen;
 import edu.sdccd.cisc191.architectbankaccount.screen.ScreenManager;
 import edu.sdccd.cisc191.architectbankaccount.savingandsorting.SinglyLinkedList;
@@ -10,13 +9,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
-import java.sql.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class BankScreen implements Screen {
+public class BankScreen {
 
     Scene scene;
     ScreenManager manager;
@@ -24,14 +23,13 @@ public class BankScreen implements Screen {
 
     public static String sortingType;
 
-    public BankScreen(ScreenManager manager) {
-        startScreen();
+    public BankScreen(ScreenManager manager, double money) {
+        startScreen(money);
         this.manager = manager;
         this.dateList = new SinglyLinkedList();
     }
 
-    @Override
-    public void startScreen() {
+    public void startScreen(double money) {
         GridPane pane = new GridPane();
         pane.setPadding(new Insets(20));
         pane.setVgap(10);
@@ -39,11 +37,12 @@ public class BankScreen implements Screen {
 
         TextArea transactions = new TextArea();
         transactions.setEditable(false);
-
-        Label amountOfMoney = new Label("$10.00");
+        Label amountOfMoney = new Label("$" + money + "0");
         amountOfMoney.setTranslateX(230);
         amountOfMoney.setTranslateY(-60);
         amountOfMoney.setFont(Font.font("Lucida Console", 25));
+
+        AtomicInteger amountOfTransactions = new AtomicInteger();
 
         Button addMoneyButton = new Button("Add Money");
         addMoneyButton.setOnMouseClicked(e -> {
@@ -65,12 +64,10 @@ public class BankScreen implements Screen {
                     double amount = Double.parseDouble(originalAmount.replace("$", ""));
                     amount += number;
                     Date date = new Date();
-                    transactions.appendText(date + ": Transaction for adding $" + String.format("%.2f", number) + " to your account.\n");
                     SinglyLinkedList.insert(dateList, date);
                     amountOfMoney.setText("$" + String.format("%.2f", amount));
-
-                    //Figure out how to sort the SingleLinkedList of dates so we can display the dates in a sorted way.
-                    SinglyLinkedList.printList(dateList);
+                    SinglyLinkedList.printSortedList(dateList, transactions, number, amountOfTransactions.get(), "adding");
+                    amountOfTransactions.getAndIncrement();
                 } catch (NumberFormatException exception) {
                     // Show an alert if the input is not a valid number
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -107,10 +104,10 @@ public class BankScreen implements Screen {
                     double amount = Double.parseDouble(originalAmount.replace("$", ""));
                     amount -= number;
                     Date date = new Date();
-                    transactions.appendText(date + ": Transaction for removing $" + String.format("%.2f", number) + " from your account.\n");
                     SinglyLinkedList.insert(dateList, date);
                     amountOfMoney.setText("$" + String.format("%.2f", amount));
-                    SinglyLinkedList.printList(dateList);
+                    SinglyLinkedList.printSortedList(dateList, transactions, number, amountOfTransactions.get(), "removing");
+                    amountOfTransactions.getAndIncrement();
                 } catch (NumberFormatException exception) {
                     // Show an alert if the input is not a valid number
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -170,8 +167,6 @@ public class BankScreen implements Screen {
             sortingType = sorting.getValue();
             System.out.println(sortingType);
         });
-
-
 
         sorting.setTranslateX(425);
         sorting.setTranslateY(-60);

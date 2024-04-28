@@ -1,7 +1,11 @@
 package edu.sdccd.cisc191.architectbankaccount.savingandsorting;
 
+
+import javafx.scene.control.TextArea;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 
 public class SinglyLinkedList {
 
@@ -107,18 +111,26 @@ public class SinglyLinkedList {
             // Go to next node
             currNode = currNode.next;
         }
-
-        printSortedList(list);
     }
 
-    public static void printSortedList(SinglyLinkedList list) {
+    public static void printSortedList(SinglyLinkedList list, TextArea text, double number, int offset, String type) {
         ArrayList<Date> dates = list.linkedListToArrayList(list);
         Date[] dateArray = list.arrayListToArray(dates);
         list.mergeSort(dateArray);
 
         System.out.println("Sorted List");
-        for (Date date : dateArray) {
-            System.out.println(date + " ");
+
+        // HashSet to store dates already printed
+        HashSet<String> printedDates = new HashSet<>();
+
+        // Print the transactions, starting from the last date
+        for (int i = dateArray.length - 1; i >= 0; i--) {
+            String currentDate = dateArray[i].toString();
+            if (!printedDates.contains(currentDate) && i != offset) {
+                // If the date is not already printed and not the offset date, append it
+                text.appendText(currentDate + ": Transaction for " + type + " $" + String.format("%.2f", number) + " from your account.\n");
+                printedDates.add(currentDate); // Add the printed date to HashSet
+            }
         }
     }
 }

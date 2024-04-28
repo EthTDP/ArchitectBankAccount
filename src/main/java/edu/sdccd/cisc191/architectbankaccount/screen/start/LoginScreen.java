@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Properties;
 
 public class LoginScreen implements Screen {
     Scene scene;
@@ -158,49 +159,37 @@ public class LoginScreen implements Screen {
     private void loginToAccount(TextField usernameField, PasswordField passwordField, Text passwordCorrect) {
         String username = usernameField.getText();
         String password = passwordField.getText();
+
         // Implementation of Logging In
+        BankAccount.accounts.forEach(account -> {
+            String accountUser = account.getUsername();
+            String accountPassword = account.getPassword();
 
-        ArrayList<String> usernames = new ArrayList<>();
-        ArrayList<String> passwords = new ArrayList<>();
+            boolean usernameAvailable = false;
+            boolean passwordAvailable = false;
 
-        try(Connection connection = DriverManager.getConnection("jdbc:postgresql://cisc191.cnja3eafntr2.us-east-1.rds.amazonaws.com:5432/", "postgres", BankAccount.password)) {
+            if(username.equals(accountUser))
+                usernameAvailable = true;
+            else
+                passwordCorrect.setText("Incorrect Username! Please try again or sign up.");
 
-            String sql = "SELECT * FROM logininfo";
 
-            try(Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql)) {
-                while(resultSet.next()) {
+            if(password.equals(accountPassword))
+                passwordAvailable = true;
+            else
+                passwordCorrect.setText("Incorrect Password! Please try again or sign up.");
 
-                    usernames.add(resultSet.getString("username"));
-                    passwords.add(resultSet.getString("password"));
-                }
-            } catch (Exception exception) {
-                System.out.println(exception.getMessage());
+            if(!username.equals(accountUser) || !password.equals(accountPassword))
+                passwordCorrect.setText("Incorrect Username and Password! Please try again or sign up.");
+
+
+
+            if(usernameAvailable && passwordAvailable) {
+                manager.setBankScene(account.getMoney());
             }
-        } catch (SQLException exception) {
-            System.out.println(exception.getMessage());
-        }
-
-        boolean usernameAvailable = false;
-        boolean passwordAvailable = false;
-
-        if(!(usernames.contains(username)) || !(passwords.contains(password)))
-            passwordCorrect.setText("Incorrect Username and Password! Please try again or sign up.");
-
-        if(usernames.contains(username))
-            usernameAvailable = true;
-        else
-            passwordCorrect.setText("Incorrect Username! Please try again or sign up.");
-
-        if(passwords.contains(password))
-            passwordAvailable = true;
-        else
-            passwordCorrect.setText("Incorrect Password! Please try again or sign up.");
+        });
 
 
-        if(usernameAvailable && passwordAvailable) {
-            manager.setBankScene();
-        }
     }
 
 

@@ -185,7 +185,7 @@ public class BankScreen {
         //Recursion with compound interest
     }
 
-    private static double compoundInterest(double initial, double rates, int years, double annualRate) {
+    public static double compoundInterest(double initial, double rates, int years, double annualRate) {
         if(years == 0) {
             return initial;
         } else {

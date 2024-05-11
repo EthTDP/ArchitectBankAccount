@@ -60,7 +60,7 @@ public class SinglyLinkedList {
         return dates;
     }
 
-    private void mergeSort(Date[] list) {
+    public static void mergeSort(Date[] list) {
         if (list.length > 1) {
             // Merge sort the first half
             Date[] firstHalf = new Date[list.length / 2];

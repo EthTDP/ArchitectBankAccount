@@ -55,7 +55,11 @@ public class BankAccount extends Application {
     @Override
     public void init() throws Exception {
         springContext  = SpringApplication.run(BankAccount.class);
+    }
 
+    public static void initAccount() throws Exception {
+        BankAccount account = new BankAccount();
+        account.init();
     }
 
     @Bean

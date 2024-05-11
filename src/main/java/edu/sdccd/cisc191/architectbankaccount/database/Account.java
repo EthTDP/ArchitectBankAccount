@@ -4,6 +4,8 @@ package edu.sdccd.cisc191.architectbankaccount.database;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 @Table(schema = "public", name = "logininfo")
 @Entity
@@ -65,6 +67,20 @@ public class Account
 
     public void setMoney(Double money) {
         this.money = money;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        Account account = (Account) object;
+        return this.id == account.getId() && Objects.equals(this.username, account.getUsername()) && Objects.equals(this.password, account.getPassword());
     }
 
     @Override

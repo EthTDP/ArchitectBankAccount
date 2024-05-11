@@ -183,7 +183,6 @@ public class LoginScreen implements Screen {
                 passwordCorrect.setText("Incorrect Username and Password! Please try again or sign up.");
 
 
-
             if(usernameAvailable && passwordAvailable) {
                 manager.setBankScene(account.getMoney());
             }
